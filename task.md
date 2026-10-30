@@ -1,7 +1,0 @@
-- [x] Load settings from `localStorage`
-- [x] Create `saveSettings()` function
-- [x] Add "Upload Custom Photo" button to the UI shell
-- [x] Implement image resizing and Base64 conversion
-- [x] Bind real-time `input` event for CV text edits
-- [x] Build the app (`npm run build`)
-- [x] Push changes to GitHub

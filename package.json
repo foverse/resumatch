@@ -1,0 +1,33 @@
+{
+  "name": "ai-cv-adapt",
+  "version": "1.0.0",
+  "description": "Free AI resume and CV tailor that matches your resume to any job description. Live ATS keyword alignment, one-page layout protection, and PDF export.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "ai-resume",
+    "resume-builder",
+    "cv-tailor",
+    "ats-resume",
+    "career-tools",
+    "job-application",
+    "resume-matcher",
+    "vite",
+    "javascript"
+  ],
+  "author": "Fouad (https://growthmaker.fr)",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^6.0.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "puppeteer": "^25.4.0"
+  }
+}

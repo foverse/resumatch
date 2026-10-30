@@ -1,5 +1,4 @@
 [build]
-  base = "outputs"
   publish = "dist"
   command = "npm install && npm run build"
 
