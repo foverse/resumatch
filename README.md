@@ -23,13 +23,11 @@ ResuMatch takes a different approach:
 
 ---
 
-## Visual Previews
+## Your resume, tailored to the role
 
-### Application Interface & Adaptation Dashboard
-![ResuMatch Dashboard](assets/preview-app.png)
+![Illustration of a resume alongside a job description](assets/resumatch-overview-illustration.png)
 
-### Real-Time Layout & Single-Page PDF Formatting
-![ResuMatch Layout Engine](assets/preview-cv-layout.png)
+Add a job description, adjust your resume in the live preview, and export the finished document. The illustration above is a conceptual overview, not an application screenshot.
 
 ---
 
