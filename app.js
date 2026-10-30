@@ -62,7 +62,7 @@ function localizeCv(){const labels=cvLabels();document.querySelectorAll('.cv-sec
 
 function shell() {
   document.querySelector('#app').innerHTML = `
-    <header class="topbar"><div class="brand"><img class="brand-logo" src="./resumatch-logo.svg" alt=""><span>ResuMatch</span></div><div class="top-meta"><span class="privacy"><i></i> Stored locally</span><button class="button primary" id="print"><span>${settings.coverLetter ? 'Export Both' : 'Export PDF'}</span><span class="shortcut">⌘ P</span></button>${settings.coverLetter ? `<button class="button secondary" id="print-letter" style="margin-left:6px; background:#e8f4f6; color:#17687a; border:1px solid #b2d7de; font-weight:700;"><span>Export Cover Letter</span></button>` : ''}</div></header>
+    <header class="topbar"><div class="brand"><img class="brand-logo" src="./resumatch-logo-generated.png" alt=""><span>ResuMatch</span></div><div class="top-meta"><span class="privacy"><i></i> Stored locally</span><button class="button primary" id="print"><span>${settings.coverLetter ? 'Export Both' : 'Export PDF'}</span><span class="shortcut">⌘ P</span></button>${settings.coverLetter ? `<button class="button secondary" id="print-letter" style="margin-left:6px; background:#e8f4f6; color:#17687a; border:1px solid #b2d7de; font-weight:700;"><span>Export Cover Letter</span></button>` : ''}</div></header>
     <main class="workspace">
       <aside class="sidebar" aria-label="CV configuration">
         <div class="sidebar-intro"><h1>Prepare your resume</h1><p>Add a job description, edit your resume, and export when it’s ready.</p></div>

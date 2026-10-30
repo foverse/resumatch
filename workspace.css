@@ -3,7 +3,7 @@
   :root { --ink:#263551; --navy:#344773; --muted:#6d7a90; --line:#dfe4eb; --purple:#405789; --lavender:#e9edf5; }
   body { background:#eef0f3; font-size:14px; }
   .topbar { height:68px; padding:0 32px; background:#fff; backdrop-filter:none; }
-  .brand { font-size:18px; letter-spacing:-.035em; }.brand-logo { width:36px; height:36px; }
+  .brand { font-size:18px; letter-spacing:-.035em; gap:2px; }.brand-logo { width:48px; height:48px; object-fit:contain; }
   .workspace { grid-template-columns:minmax(340px,410px) minmax(0,1fr); min-height:calc(100vh - 68px); }
   .sidebar { background:#fff; padding:36px 30px 60px; }.sidebar-intro { padding:0 0 30px; }.sidebar h1 { font-size:24px; line-height:1.2; letter-spacing:-.035em; }.sidebar-intro>p:last-child { max-width:300px; font-size:13px; color:#67758b; }
   .panel { padding:17px 0; }.panel-toggle { font-size:14px; font-weight:700; }.panel-body { padding-top:18px; }.panel label { font-size:12px; }.panel textarea,.panel input,.panel select { font-size:13px; line-height:1.5; padding:11px 12px; }.panel textarea { min-height:160px; }.panel .json-editor { min-height:120px; }
