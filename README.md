@@ -1,20 +1,20 @@
-# AI CV Adapt: Open-Source AI Resume & CV Tailoring Engine
+# ResuMatch: Open-Source AI Resume Matcher & CV Tailoring Engine
 
-A fast, privacy-first web application that adapts your resume to match specific job descriptions, highlights ATS keyword gaps, and exports pixel-perfect single-page PDFs.
+A fast, privacy-first web application that matches your resume to specific job descriptions, highlights ATS keyword gaps, and exports pixel-perfect single-page PDFs.
 
-- Live Web App: [https://foverse.github.io/ai-cv-adapt/](https://foverse.github.io/ai-cv-adapt/)
-- Repository: [https://github.com/foverse/ai-cv-adapt](https://github.com/foverse/ai-cv-adapt)
+- Live Web App: [https://foverse.github.io/resumatch/](https://foverse.github.io/resumatch/)
+- Repository: [https://github.com/foverse/resumatch](https://github.com/foverse/resumatch)
 - Author: [Fouad](https://growthmaker.fr) ([@foverse](https://github.com/foverse))
 - Project Hub: [growthmaker.fr](https://growthmaker.fr)
 - License: MIT
 
 ---
 
-## Why AI CV Adapt?
+## Why ResuMatch?
 
 Most job applicants send a single generic resume to hundreds of postings, or use generic AI tools that hallucinate fake skills and ruin document formatting. 
 
-AI CV Adapt takes a different approach:
+ResuMatch takes a different approach:
 
 1. **Immutable Master CV:** Your actual work experience remains your single source of truth. The engine tailors language, highlights relevant accomplishments, and targets the job description without inventing fictional roles.
 2. **ATS Keyword & Gap Detection:** Identifies exact keyword matches and surfaces missing terms required by applicant tracking systems.
@@ -26,10 +26,10 @@ AI CV Adapt takes a different approach:
 ## Visual Previews
 
 ### Application Interface & Adaptation Dashboard
-![AI CV Adapt Dashboard](assets/preview-app.png)
+![ResuMatch Dashboard](assets/preview-app.png)
 
 ### Real-Time Layout & Single-Page PDF Formatting
-![CV Single Page Layout Engine](assets/preview-cv-layout.png)
+![ResuMatch Layout Engine](assets/preview-cv-layout.png)
 
 ---
 
@@ -61,8 +61,8 @@ AI CV Adapt takes a different approach:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/foverse/ai-cv-adapt.git
-cd ai-cv-adapt
+git clone https://github.com/foverse/resumatch.git
+cd resumatch
 ```
 
 ### 2. Install dependencies
@@ -97,7 +97,7 @@ npm run preview
 ## Project Structure
 
 ```
-ai-cv-adapt/
+resumatch/
 ├── index.html                  # Main application shell with SEO meta tags
 ├── app.js                      # Core adaptation engine, ATS matcher, and state store
 ├── server.js                   # Express server and Puppeteer PDF renderer

@@ -1,7 +1,7 @@
 {
-  "name": "ai-cv-adapt",
+  "name": "resumatch",
   "version": "1.0.0",
-  "description": "Free AI resume and CV tailor that matches your resume to any job description. Live ATS keyword alignment, one-page layout protection, and PDF export.",
+  "description": "Free AI resume matcher and CV tailor. Matches your experience to any job description, surfaces ATS keyword gaps, and exports 1-page PDFs.",
   "type": "module",
   "scripts": {
     "start": "node server.js",
@@ -10,15 +10,16 @@
     "preview": "vite preview"
   },
   "keywords": [
-    "ai-resume",
-    "resume-builder",
-    "cv-tailor",
-    "ats-resume",
-    "career-tools",
-    "job-application",
+    "resumatch",
     "resume-matcher",
-    "vite",
-    "javascript"
+    "resume-tailor",
+    "ats-resume",
+    "cv-tailor",
+    "career-tools",
+    "job-search",
+    "open-source",
+    "javascript",
+    "vite"
   ],
   "author": "Fouad (https://growthmaker.fr)",
   "license": "MIT",
