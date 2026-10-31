@@ -15,6 +15,50 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
+// Auth API endpoints (Optional server-side backup)
+const inMemoryUsers = new Map();
+inMemoryUsers.set('demo@resumatch.io', {
+    id: 'usr_demo_001',
+    name: 'Alex Morgan',
+    email: 'demo@resumatch.io',
+    password: 'Password123!'
+});
+
+app.get('/api/auth/status', (req, res) => {
+    res.json({ status: 'ok', clientAuth: true });
+});
+
+app.post('/api/auth/login', (req, res) => {
+    const { email, password } = req.body;
+    const user = inMemoryUsers.get(String(email || '').toLowerCase().trim());
+    if (!user || user.password !== password) {
+        return res.status(401).json({ error: 'Invalid email or password' });
+    }
+    res.json({
+        user: { id: user.id, name: user.name, email: user.email },
+        token: 'rmt_' + Date.now().toString(36)
+    });
+});
+
+app.post('/api/auth/register', (req, res) => {
+    const { name, email, password } = req.body;
+    const cleanEmail = String(email || '').toLowerCase().trim();
+    if (inMemoryUsers.has(cleanEmail)) {
+        return res.status(400).json({ error: 'User already exists' });
+    }
+    const newUser = {
+        id: 'usr_' + Date.now().toString(36),
+        name: name || 'User',
+        email: cleanEmail,
+        password
+    };
+    inMemoryUsers.set(cleanEmail, newUser);
+    res.json({
+        user: { id: newUser.id, name: newUser.name, email: newUser.email },
+        token: 'rmt_' + Date.now().toString(36)
+    });
+});
+
 // Serve static files from Vite build (dist)
 app.use(express.static(path.join(__dirname, 'dist')));
 app.use(express.static(__dirname)); // Fallback for raw static assets

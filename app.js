@@ -13,6 +13,9 @@ import defaultCvWebmasterEnJob from './default-cv-webmaster-en-job.json';
 import './style.css';
 import './enhancements.css';
 import './refinements.css';
+import './auth.css';
+import { AuthService } from './auth.js';
+import { AuthUI } from './auth-ui.js';
 
 const KEY = 'cv-adapt-cv-v1';
 const DESIGN_KEY = 'cv-adapt-default-design';
@@ -22,7 +25,10 @@ const defaultSettings = { template: savedDefaultDesign, defaultTemplate: savedDe
 let savedSettings = {};
 try { savedSettings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'); } catch(e) {}
 const settings = { ...defaultSettings, ...savedSettings, template: savedDefaultDesign };
-const saveSettings = () => localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+const saveSettings = () => {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  AuthService.saveUserSettings(settings);
+};
 const state = {
   cv: JSON.parse(localStorage.getItem(KEY) || JSON.stringify(defaultCv)),
   job: 'We are looking for a Digital Marketing Lead to own SEO strategy, content operations, lifecycle marketing, and reporting. You will lead a small team, partner with product, and grow qualified pipeline through data-informed experiments.',
@@ -32,7 +38,10 @@ const state = {
 const $ = (s, root = document) => root.querySelector(s);
 const esc = (v = '') => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clean = v => String(v || '').replace(/[–—]/g, '-');
-const save = () => localStorage.setItem(KEY, JSON.stringify(state.cv));
+const save = () => {
+  localStorage.setItem(KEY, JSON.stringify(state.cv));
+  AuthService.saveUserActiveCv(state.cv);
+};
 if (state.cv.personal?.photo === 'profile-default.png') { state.cv.personal.photo = 'profile-default.jpg'; save(); }
 if (state.cv.personal && !state.cv.personal.website) { state.cv.personal.website = 'growthmaker.fr'; save(); }
 const avatar = () => state.cv.personal.photo || 'profile-avatar.svg';
@@ -61,7 +70,7 @@ function localizeCv(){const labels=cvLabels();document.querySelectorAll('.cv-sec
 
 function shell() {
   document.querySelector('#app').innerHTML = `
-    <header class="topbar"><div class="brand"><span class="brand-mark">CA</span><span>CV Adapt</span></div><div class="top-meta"><span class="privacy"><i></i> Stored locally</span><button class="button primary" id="print"><span>${settings.coverLetter ? 'Export Both' : 'Export PDF'}</span><span class="shortcut">⌘ P</span></button>${settings.coverLetter ? `<button class="button secondary" id="print-letter" style="margin-left:6px; background:#e8f4f6; color:#17687a; border:1px solid #b2d7de; font-weight:700;"><span>Export Cover Letter</span></button>` : ''}</div></header>
+    <header class="topbar"><div class="brand"><span class="brand-mark">RM</span><span>ResuMatch</span></div><div class="top-meta"><div id="auth-topbar-widget" class="auth-topbar-container"></div><span class="privacy"><i></i> Stored locally</span><button class="button primary" id="print"><span>${settings.coverLetter ? 'Export Both' : 'Export PDF'}</span><span class="shortcut">⌘ P</span></button>${settings.coverLetter ? `<button class="button secondary" id="print-letter" style="margin-left:6px; background:#e8f4f6; color:#17687a; border:1px solid #b2d7de; font-weight:700;"><span>Export Cover Letter</span></button>` : ''}</div></header>
     <main class="workspace">
       <aside class="sidebar" aria-label="CV configuration">
         <div class="sidebar-intro"><p class="eyebrow">Workspace / 01</p><h1>Shape a sharper CV.</h1><p>Adapt your story to a role, then print a clean one-page document.</p></div>
@@ -71,9 +80,10 @@ function shell() {
         <section class="panel"><button class="panel-toggle">CV source <span>＋</span></button><div class="panel-body"><div class="source-actions"><label class="button secondary file-label">Upload JSON<input id="upload" type="file" accept="application/json"/></label><button class="button secondary" id="reset">Reset French</button></div><div class="cv-language-actions"><button class="button secondary" id="default-fr">French default</button><button class="button secondary" id="default-en">English default</button></div><textarea class="json-editor" id="json" rows="8">${esc(JSON.stringify(state.cv,null,2))}</textarea><p class="validation ${state.jsonError?'error':''}" id="validation">${state.jsonError || 'Valid CV JSON. Saved locally.'}</p></div></section>
         <section class="panel"><button class="panel-toggle">AI Workflow Guide <span>＋</span></button><div class="panel-body"><p style="font-size:12px; line-height:1.45; color:#476170; margin-bottom:8px;">No API key needed! CV Adapt copies your tailored prompt directly and opens <strong>Gemini</strong> or <strong>Claude</strong> in a new tab.</p><ol style="font-size:11.5px; padding-left:18px; margin:0; line-height:1.6; color:#2c404d;"><li>Click <strong>Open in Gemini/Claude</strong> above.</li><li>Press <strong>Ctrl + V</strong> in the AI window and hit Enter.</li><li>Copy the JSON response from AI.</li><li>Click <strong>Paste AI JSON into CV</strong>.</li></ol></div></section>
       </aside>
-      <section class="canvas"><div class="canvas-head"><div><p class="eyebrow">Live document / A4</p><h2>${state.adapted ? 'Adapted CV' : 'Ready to adapt'}</h2></div><div class="canvas-tools"><button class="button edit-switch ${settings.editMode?'active':''}" id="edit-mode">${settings.editMode?'Finish editing':'Edit CV'}</button><div class="score-mini"><span>ATS match</span><strong>${ats().score}<small>/100</small></strong></div></div></div><nav class="tabs" role="tablist">${['original','adapted','changes','ai'].map(t => `<button class="tab ${state.tab===t?'active':''}" data-tab="${t}">${t[0].toUpperCase()+t.slice(1)}${t==='changes'?'<sup>3</sup>':''}</button>`).join('')}</nav><div class="canvas-content">${state.tab === 'changes' ? changesView() : state.tab === 'ai' ? aiView() : previewView()}</div></section>
+      <section class="canvas"><div class="canvas-head"><div><p class="eyebrow">Live document / A4</p><h2>${state.adapted ? 'Adapted CV' : 'Ready to adapt'}</h2></div><div class="canvas-tools"><button class="button edit-switch ${settings.editMode?'active':''}" id="edit-mode">${settings.editMode?'Finish editing':'Edit CV'}</button><button class="button secondary" id="quick-save-version" style="padding:8px 11px; font-size:10px; display:inline-flex; align-items:center; gap:5px;" title="Save current tailored resume snapshot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg><span>Save Version</span></button><div class="score-mini"><span>ATS match</span><strong>${ats().score}<small>/100</small></strong></div></div></div><nav class="tabs" role="tablist">${['original','adapted','changes','ai'].map(t => `<button class="tab ${state.tab===t?'active':''}" data-tab="${t}">${t[0].toUpperCase()+t.slice(1)}${t==='changes'?'<sup>3</sup>':''}</button>`).join('')}</nav><div class="canvas-content">${state.tab === 'changes' ? changesView() : state.tab === 'ai' ? aiView() : previewView()}</div></section>
     </main><div class="toast" role="status"></div>`;
   addTopDefaults(); addTemplateChoices(); addDefaultDesignControl(); addDefaultSourceControls(); enhanceControls(); bind(); renderPreview(); renderFilename();
+  AuthUI.renderTopbarWidget();
 }
 
 function ats() { const text = JSON.stringify(state.cv).toLowerCase(); const job = state.job.toLowerCase(); const keywords = [...new Set((job.match(/[a-z][a-z+#&]{3,}/g)||[]).filter(k=>!['with','that','this','will','your','from','have','they','you','lead','role'].includes(k)))]; const hits=keywords.filter(k=>text.includes(k)); let score=50+Math.min(30, hits.length*4)+(state.cv.personal.email?5:0)+(state.cv.personal.phone?5:0)+(state.cv.experience?.length?5:0)+(state.cv.summary?5:0); return {score:Math.min(100,score), keywords, hits}; }
@@ -96,6 +106,18 @@ function changesView(){ return `<div class="insight-page"><p class="eyebrow">Ada
 function aiView(){ return `<div class="insight-page"><p class="eyebrow">Web AI Workflow</p><h2>Adapt with Gemini, Claude, or ChatGPT in your browser.</h2><p class="lead">No API key or complex setup required. Choose your favorite AI assistant, generate your tailored prompt in 1 click, and paste the returned JSON directly back into your CV.</p><div class="ai-callout" style="margin-bottom:15px;"><span class="ai-orb">✦</span><div><strong>Google Gemini</strong><p>Fast and accurate. Prompt copied to clipboard → open gemini.google.com and press Ctrl+V.</p></div></div><div class="ai-callout" style="margin-bottom:15px;"><span class="ai-orb" style="background:linear-gradient(135deg,#d97706,#b45309)">✻</span><div><strong>Anthropic Claude</strong><p>Exceptional editorial nuance. Prompt copied to clipboard → open claude.ai and press Ctrl+V.</p></div></div><div class="ai-callout"><span class="ai-orb" style="background:linear-gradient(135deg,#10a37f,#059669)">🤖</span><div><strong>OpenAI ChatGPT</strong><p>Direct pre-fill supported! Prompt is loaded directly into chatgpt.com text input field.</p></div></div></div>`; }
 function bind(){ document.querySelectorAll('.panel-toggle').forEach(b=>b.onclick=()=>b.parentElement.classList.toggle('open')); document.querySelectorAll('[data-template]').forEach(b=>b.onclick=()=>{settings.template=b.dataset.template;shell()}); document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;shell()}); $('#adapt-alternance').onclick=()=>openInAI(state.aiProvider,'alternance'); $('#adapt-job').onclick=()=>openInAI(state.aiProvider,'job'); document.querySelectorAll('.provider-btn').forEach(btn=>btn.onclick=()=>{state.aiProvider=btn.dataset.provider;localStorage.setItem('cv-adapt-provider',state.aiProvider);shell();}); $('#edit-mode').onclick=()=>{settings.editMode=!settings.editMode;toast(settings.editMode?'Editing enabled. Turn it off before exporting.':'Editing disabled. The CV is ready to export.');shell()}; $('#print').onclick=()=>exportPdf('all'); if($('#print-letter')) $('#print-letter').onclick=()=>exportPdf('letter'); $('#job').oninput=e=>state.job=clean(e.target.value); $('#priority').oninput=e=>state.priority=clean(e.target.value); $('#reset').onclick=()=>{state.cv=JSON.parse(JSON.stringify(defaultCv));save();toast('Default CV restored');shell()}; $('#photo').onchange=e=>{settings.photo=e.target.checked;saveSettings();renderPreview()}; $('#cover-letter').onchange=e=>{settings.coverLetter=e.target.checked;if(settings.coverLetter&&!state.cv.coverLetter){state.cv.coverLetter={};save();}saveSettings();shell();}; $('#font').oninput=e=>{settings.font=e.target.value;saveSettings();updateControls();renderPreview()}; $('#margin').oninput=e=>{settings.margin=e.target.value;saveSettings();updateControls();renderPreview()}; $('#line').oninput=e=>{settings.line=e.target.value;saveSettings();updateControls();renderPreview()}; $('#hide-linkedin').onchange=e=>{settings.hideLinkedin=e.target.checked;saveSettings();renderPreview()}; $('#hide-website').onchange=e=>{settings.hideWebsite=e.target.checked;saveSettings();renderPreview()}; $('#hide-phone').onchange=e=>{settings.hidePhone=e.target.checked;saveSettings();renderPreview()}; $('#hide-location').onchange=e=>{settings.hideLocation=e.target.checked;saveSettings();renderPreview()}; $('#hide-summary').onchange=e=>{settings.hideSummary=e.target.checked;saveSettings();renderPreview()}; $('#hide-skills').onchange=e=>{settings.hideSkills=e.target.checked;saveSettings();renderPreview()}; $('#hide-languages').onchange=e=>{settings.hideLanguages=e.target.checked;saveSettings();renderPreview()}; $('#hide-certifications').onchange=e=>{settings.hideCertifications=e.target.checked;saveSettings();renderPreview()}; $('#hide-experience').onchange=e=>{settings.hideExperience=e.target.checked;saveSettings();renderPreview()}; $('#hide-education').onchange=e=>{settings.hideEducation=e.target.checked;saveSettings();renderPreview()}; $('#json').oninput=e=>{try{const next=JSON.parse(e.target.value);state.cv=next;state.jsonError='';save();$('#validation').textContent='Valid CV JSON. Saved locally.';$('#validation').classList.remove('error');renderPreview()}catch(err){state.jsonError='JSON needs attention: '+err.message;$('#validation').textContent=state.jsonError;$('#validation').classList.add('error')}}; $('#upload').onchange=e=>{const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{$('#json').value=reader.result;$('#json').dispatchEvent(new Event('input'));toast('CV JSON imported')};reader.readAsText(f)}; document.addEventListener('blur', editHandler, true); document.addEventListener('input', editHandler, true); 
   
+  const quickSave = $('#quick-save-version');
+  if (quickSave) {
+    quickSave.onclick = () => {
+      if (AuthService.isLoggedIn()) {
+        AuthUI.openSavedResumesModal(true);
+      } else {
+        toast('Please log in or register to save your CV versions.');
+        AuthUI.openAuthModal('login');
+      }
+    };
+  }
+
   const uploadPhoto = $('#upload-photo');
   if (uploadPhoto) {
     uploadPhoto.onchange=e=>{
@@ -211,4 +233,56 @@ function promptText(track='alternance'){
   return `Create a ${track==='job'?'regular job':'work-study (alternance)'} CV from the DEFAULT SOURCE CV (${trackName}) and TARGET JOB DESCRIPTION below. Always start from this default CV, even if another adapted CV was previously pasted into the application.\n\nSTRICT OUTPUT CONTRACT:\n1. Return ONLY one valid JSON object. The first character must be { and the last character must be }. No markdown fences, comments, explanations, or text outside JSON.\n2. Preserve the exact source schema, field names, nested object shapes, and array types. Do not add, remove, or rename fields. The result must work with JSON.parse.\n3. Keep contact details, employers, institutions, locations, dates, certifications, factual metrics, and URLs accurate. Do not invent employment, achievements, credentials, responsibilities, or results.\n4. OUTPUT LANGUAGE: ${language}. Write every candidate-facing field in ${language}. Keep names, employers, locations, dates, contact details, URLs, and filenames unchanged.\n5. Rewrite personal.role each time as a simple 2-5 word job title that fits the position and is supported by the CV.\n\nSKILLS & KEYWORD MATCHING (CRITICAL):\n6. JOB ANALYSIS: First, deeply analyze the TARGET JOB DESCRIPTION to identify the most crucial keywords, core competencies, and specific software tools the employer requires.\n7. REALISTIC MAPPING: Compare these employer requirements with the DEFAULT SOURCE CV. When you find a genuine match or a highly transferable skill, use the EXACT terminology and keywords from the job description in the CV. This ensures ATS compliance and recruiter resonance.\n8. MASTER SKILLS LIST & INFERENCE: The DEFAULT SOURCE CV contains a master list of the candidate's tools and skills. Pick the BEST ones for this specific job. Additionally, if the job description demands other easy-to-use tools or similar tools to the ones the candidate already knows (e.g. asking for Trello/Asana, or asking for Ahrefs when the candidate knows Semrush), you MUST add them to the skills array and experience bullets to ensure a perfect match.\n9. THE SKILLS ARRAY: Return 10-14 focused strings. Select the most relevant tools from the master list, and intelligently inject any similar/easy-to-use tools demanded by the job. Use the exact keywords from the job offer. Keep capabilities separate from tools.\n9a. TOOL INFERENCE: If the job asks for a capability (e.g., SEO, Analytics) but no specific tool, proactively surface the most relevant tools from the source CV (e.g., Semrush, GA4) to prove you can execute that capability.\n\nCOVER LETTER:\n11. Add a new object to the root of the JSON called "coverLetter". Inside it, provide exactly one string field called "paragraph".\n12. This "paragraph" must be a highly personalized, natural, and simple paragraph (3-5 sentences) written in ${language}. Use a conversational but professional tone—avoid overly formal, robotic, or bloated corporate jargon. It should explicitly connect the candidate's background to the core needs of this specific role, demonstrating enthusiasm and immediate value. NOTE: The candidate is male, so strictly use masculine grammatical agreement in French (e.g., "Je suis prêt", not "Je suis prête").\n\nPERSONALISATION:\n13. Make the summary, role title, skills, experience bullets, and education descriptions tell one coherent story for this role, integrating the job's crucial keywords naturally. Keep the writing concise, never generic.\n14. Treat Freelance Growth & Digital as an adaptable evidence base for app growth, ASO, acquisition, monetisation, WordPress, creative production, and client projects. Tailor the English and Linguistics degree toward relevant bilingual communication, writing, editorial analysis, content, and cross-cultural skills.\n15. Use at most 3 concise, achievement-focused bullets per experience. Preserve numbers exactly when present. Keep the full CV suitable for one A4 page.\n16. Use normal hyphens only, never em dashes or en dashes.\n17. NEVER mention the name of the company hiring for this role anywhere in the CV or Cover Letter, neither in French nor in English. Do not use phrases like "Excited to join [Company]" or "Ravi de rejoindre [Company]". The content must look naturally tailored to the role, but entirely independent of the specific company name.\n\nBefore answering, silently check: valid JSON, exact schema, correct language, clear role title, a newly tailored skills array, the added coverLetter object, only credible claims, no target company names, and concise one-page content.\n\nDEFAULT SOURCE CV JSON (${trackName}):\n${JSON.stringify(source,null,2)}\n\nTARGET JOB DESCRIPTION:\n${state.job}\n\nPRIORITY INSTRUCTION:\n${state.priority||'None.'}`;
 }
 function toast(msg){const t=$('.toast');if(!t)return;t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
-shell();
+
+function handleUserLogin(user) {
+  const userCv = AuthService.getUserActiveCv();
+  if (userCv) {
+    state.cv = userCv;
+  } else {
+    AuthService.saveUserActiveCv(state.cv);
+  }
+  const userSettings = AuthService.getUserSettings();
+  if (userSettings) {
+    Object.assign(settings, userSettings);
+  }
+  save();
+  saveSettings();
+  shell();
+}
+
+function handleUserLogout() {
+  try {
+    state.cv = JSON.parse(localStorage.getItem(KEY) || JSON.stringify(defaultCv));
+  } catch(e) {
+    state.cv = JSON.parse(JSON.stringify(defaultCv));
+  }
+  shell();
+}
+
+AuthService.init().then(() => {
+  const user = AuthService.getCurrentUser();
+  if (user) {
+    const userCv = AuthService.getUserActiveCv();
+    if (userCv) state.cv = userCv;
+    const userSettings = AuthService.getUserSettings();
+    if (userSettings) Object.assign(settings, userSettings);
+  }
+  AuthUI.init({
+    onLogin: (u) => handleUserLogin(u),
+    onLogout: () => handleUserLogout(),
+    onLoadResume: (cvData, loadedSettings) => {
+      state.cv = JSON.parse(JSON.stringify(cvData));
+      if (loadedSettings && Object.keys(loadedSettings).length > 0) {
+        Object.assign(settings, loadedSettings);
+      }
+      save();
+      saveSettings();
+      shell();
+    },
+    getCurrentCvData: () => state.cv,
+    getCurrentSettings: () => settings,
+    getCurrentScore: () => ats().score,
+    showToast: (msg) => toast(msg)
+  });
+  shell();
+});

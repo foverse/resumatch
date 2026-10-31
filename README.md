@@ -54,6 +54,12 @@ ResuMatch takes a different approach:
 - Native Browser Print: Single-click print stylesheet (`Ctrl+P`) configured for A4 and Letter dimensions.
 - Server-Side Headless Chrome: High-precision PDF export via Puppeteer for consistent cross-browser rendering.
 
+### 5. Secure Authentication & Multi-Version Resume Management
+- **Zero-Setup Privacy First:** Fast client-side authentication with SHA-256 password hashing. Works 100% locally and on GitHub Pages with zero remote database dependencies.
+- **Instant 1-Click Demo:** Pre-configured demo user (`demo@resumatch.io` / `Password123!`) for immediate evaluation.
+- **Multiple Saved Resumes:** Save customized snapshots for different companies and job titles (e.g. Growth Lead, Content Strategist) with instant 1-click loading.
+- **Data Isolation & Profile Settings:** Maintain isolated active CV states and customized typography settings per user account.
+
 ---
 
 ## Quick Start
